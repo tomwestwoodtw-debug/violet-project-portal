@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1040 520" role="img" aria-labelledby="title desc">
+  <title id="title">Violet Project logo</title>
+  <desc id="desc">Violet Project logo with a pale purple fingerprint heart, violet flower and purple and black wordmark.</desc>
+  <rect width="1040" height="520" fill="#ffffff"/>
+
+  <g transform="translate(44 18)" fill="none" stroke="#e3d1fb" stroke-width="14" stroke-linecap="round" opacity="0.92">
+    <path d="M191 317C78 281 5 198 34 122 56 64 132 45 194 88 241 16 352 18 397 88c54 84 1 184-206 229Z"/>
+    <path d="M189 292C94 263 32 194 55 132c18-47 80-61 134-24 41-58 129-58 168-2 48 68 2 149-168 186Z"/>
+    <path d="M187 267C111 243 61 188 79 139c14-36 64-46 108-16 35-43 101-43 134 0 39 51 0 114-134 144Z"/>
+    <path d="M185 242C128 224 89 182 102 147c11-27 49-34 83-11 28-30 76-31 101 0 29 36-2 82-101 106Z"/>
+    <path d="M184 216c-39-13-66-41-57-64 7-18 34-23 57-8 20-18 51-18 68 1 20 23-3 56-68 71Z"/>
+    <path d="M183 190c-22-8-39-24-34-38 5-10 20-13 34-5 12-10 31-10 41 1 12 13-2 32-41 42Z"/>
+
+    <path d="M427 107c33-49 106-45 141 0 39 49 30 118-27 171"/>
+    <path d="M438 128c24-34 75-31 101 0 30 36 24 88-21 127"/>
+    <path d="M449 149c17-22 50-21 69 1 22 25 18 60-15 87"/>
+    <path d="M460 171c9-12 27-11 38 1 13 14 10 34-9 51"/>
+  </g>
+
+  <g transform="translate(372 174)">
+    <ellipse cx="65" cy="46" rx="54" ry="42" fill="#efe8fb" transform="rotate(-18 65 46)"/>
+    <ellipse cx="41" cy="58" rx="44" ry="34" fill="#c9a8ee" transform="rotate(-33 41 58)"/>
+    <ellipse cx="84" cy="57" rx="45" ry="35" fill="#b184e1" transform="rotate(27 84 57)"/>
+    <ellipse cx="61" cy="84" rx="47" ry="34" fill="#7f3bd3"/>
+    <ellipse cx="61" cy="55" rx="22" ry="16" fill="#5b1fa1" opacity="0.65"/>
+    <circle cx="62" cy="67" r="16" fill="#f0ad35"/>
+    <path d="M47 62c13 7 17 7 31 0M51 78c10-10 16-13 27-12M62 51c-5 12-5 20 0 32" stroke="#201522" stroke-width="8" stroke-linecap="round"/>
+    <circle cx="62" cy="67" r="6" fill="#201522"/>
+  </g>
+
+  <text x="512" y="248"
+    fill="#6f00b9"
+    stroke="#070707"
+    stroke-width="5"
+    paint-order="stroke fill"
+    font-family="Brush Script MT, Segoe Script, Georgia, serif"
+    font-size="150"
+    font-weight="700"
+    font-style="italic">Violet</text>
+
+  <text x="358" y="405"
+    fill="#000000"
+    font-family="Georgia, Times New Roman, serif"
+    font-size="142"
+    font-style="italic"
+    letter-spacing="28">Project</text>
+</svg>

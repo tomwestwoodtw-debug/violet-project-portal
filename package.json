@@ -1,0 +1,41 @@
+{
+  "name": "violet-project-portal",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Standalone Violet Project staff, volunteer and admin portal.",
+  "main": "server.js",
+  "engines": {
+    "node": ">=18.18.0"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "node godaddy-build.js",
+    "build:next": "next build",
+    "start": "cross-env NODE_ENV=production next start",
+    "start:server": "node server.js",
+    "preview": "next start -p 3132",
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit --pretty false --skipLibCheck --incremental false",
+    "check": "pnpm typecheck && pnpm lint",
+    "package:godaddy": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/create-godaddy-upload.ps1"
+  },
+  "dependencies": {
+    "@eslint/eslintrc": "^3",
+    "@next/eslint-plugin-next": "^15.5.6",
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "cross-env": "^7.0.3",
+    "eslint": "^9",
+    "eslint-config-next": "15.5.6",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "next": "15.5.9",
+    "react": "19.1.4",
+    "react-dom": "19.1.4",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}
