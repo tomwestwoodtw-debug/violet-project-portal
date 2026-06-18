@@ -66,3 +66,8 @@ pnpm package:godaddy
 That creates `.deploy/violet-project-portal-godaddy.zip` for upload. Add the real environment variables in the hosting dashboard, not in the zip.
 
 See `GO_DADDY_DEPLOYMENT.md` for the launch steps.
+
+For the next handover, deployment status and main-site link instructions, see:
+
+- `HANDOVER.md`
+- `MAIN_WEBSITE_LINK.md`
