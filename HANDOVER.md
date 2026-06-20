@@ -14,6 +14,16 @@ The intended final public address is:
 https://portal.violetproject.co.uk
 ```
 
+Status on 2026-06-18:
+
+- `portal.violetproject.co.uk` has been added to the Vercel project and the latest production deployment is aliased to it.
+- GoDaddy DNS has an `A` record with host `portal` pointing to `76.76.21.21`.
+- Public DNS resolves `portal.violetproject.co.uk` to `76.76.21.21`.
+- A Vercel certificate has been issued for `portal.violetproject.co.uk`, and `https://portal.violetproject.co.uk/api/health` returns `ok: true`.
+- The main Violet Project website has a published `Staff & Volunteer Portal` navigation/footer link pointing to `https://violet-project-portal.vercel.app/`.
+- The live health endpoint is passing at `https://violet-project-portal.vercel.app/api/health`.
+- The live Microsoft status endpoint reports SharePoint target and mailbox configured, with Microsoft auth still pending.
+
 Keep the existing public website at `violetproject.co.uk`. Add a clear button or nav link from the main site to the portal rather than trying to embed the portal inside the GoDaddy website builder.
 
 Recommended button text:
@@ -92,6 +102,18 @@ Need admin approval
 
 The tenant/app registration needs an authorised Microsoft 365 admin to grant consent before SharePoint and Outlook can be live.
 
+Production Vercel now has the non-secret/target configuration values from `.env.local`, including SharePoint site/drive/folder settings, OneDrive publish policy, contact mailbox and `OPENAI_EMAIL_DRAFT_MODEL`.
+
+Still missing in Vercel production because no values were available locally:
+
+```txt
+MICROSOFT_TENANT_ID
+MICROSOFT_CLIENT_ID
+MICROSOFT_CLIENT_SECRET
+GOOGLE_MAPS_API_KEY
+OPENAI_API_KEY
+```
+
 ## Required Environment Variables
 
 Do not commit real secrets. Add these in Vercel or the final app host:
@@ -136,13 +158,12 @@ https://violet-project-portal.vercel.app/api/health
 
 ## Next Priorities
 
-1. Add the `Staff & Volunteer Portal` button/link to the main Violet Project website.
-2. Connect `portal.violetproject.co.uk` to the Vercel deployment.
-3. Add the production environment variables in Vercel.
-4. Get Microsoft admin consent for the app registration.
-5. Create SharePoint lists/libraries for expenses, hours, volunteers, tasks, approvals, contacts, events, resources, messages and audit logs.
-6. Wire the portal screens to Microsoft Graph/SharePoint so staff never need to open SharePoint directly.
-7. Replace any remaining mock-only actions with real save/approve/update flows.
+1. Update the published main website link from `https://violet-project-portal.vercel.app/` to `https://portal.violetproject.co.uk`.
+2. Add the remaining production secrets in Vercel: Microsoft tenant/client/secret, Google Maps key and OpenAI key.
+3. Get Microsoft admin consent for the app registration.
+4. Create SharePoint lists/libraries for expenses, hours, volunteers, tasks, approvals, contacts, events, resources, messages and audit logs.
+5. Wire the portal screens to Microsoft Graph/SharePoint so staff never need to open SharePoint directly.
+6. Replace any remaining mock-only actions with real save/approve/update flows.
 
 ## Prompt For The Next Chat
 

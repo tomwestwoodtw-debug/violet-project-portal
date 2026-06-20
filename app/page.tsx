@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import styles from "./page.module.css";
 
@@ -204,6 +205,7 @@ type VolunteerProfile = {
   name: string;
   role: string;
   email: string;
+  pin?: string;
   phone: string;
   emergencyContact: string;
   availability: string;
@@ -217,6 +219,7 @@ type UserProfileDraft = {
   name: string;
   role: string;
   email: string;
+  pin: string;
   phone: string;
   emergencyContact: string;
   availability: string;
@@ -517,6 +520,10 @@ type MileageResult = {
   error?: string;
 };
 
+type StaffAuthResponse =
+  | { ok: true; name: string; role: Exclude<Role, "volunteer">; email: string }
+  | { ok: false; error: string };
+
 type InstallStatus = "ready" | "unsupported" | "instructions" | "installed";
 type CalendarMode = "week" | "month";
 
@@ -562,6 +569,7 @@ const emptyVolunteerProfile: VolunteerProfile = {
   name: "",
   role: "",
   email: "",
+  pin: "",
   phone: "",
   emergencyContact: "",
   availability: "",
@@ -575,6 +583,7 @@ const blankUserProfileDraft: UserProfileDraft = {
   name: "",
   role: "Volunteer",
   email: "",
+  pin: "",
   phone: "",
   emergencyContact: "",
   availability: "",
@@ -1337,6 +1346,8 @@ export default function VioletProjectPortalPage() {
   const [signedIn, setSignedIn] = useState(false);
   const [name, setName] = useState("");
   const [role, setRole] = useState<Role>("volunteer");
+  const [loginEmail, setLoginEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [pin, setPin] = useState("");
   const [message, setMessage] = useState("");
   const [tab, setTab] = useState<Tab>("home");
@@ -2753,8 +2764,8 @@ export default function VioletProjectPortalPage() {
         data.sharePoint.writable
           ? "Microsoft 365 runtime is ready."
           : data.sharePoint.configured
-            ? "SharePoint target is ready. Microsoft app credentials are still needed for live writes."
-            : "SharePoint target settings are missing.",
+            ? "Microsoft 365 storage is ready. App credentials are still needed for live writes."
+            : "Microsoft 365 storage settings are missing.",
       );
     } catch {
       setMessage("Microsoft 365 status could not be checked.");
@@ -2763,28 +2774,71 @@ export default function VioletProjectPortalPage() {
     }
   }
 
-  function signIn(event: FormEvent<HTMLFormElement>) {
+  async function signIn(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (role !== "volunteer" && !name.trim()) {
-      setMessage("Add your name first.");
+
+    const enteredIdentity = loginEmail.trim();
+    const staffEmail = enteredIdentity.toLowerCase();
+
+    if (password) {
+      if (!staffEmail) {
+        setMessage("Enter your email address.");
+        return;
+      }
+      try {
+        const response = await fetch("/api/violet/staff-login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: staffEmail, password }),
+        });
+        const result = (await response.json()) as StaffAuthResponse;
+        if (!response.ok || !result.ok) {
+          setMessage(result.ok ? "Staff login failed." : result.error);
+          return;
+        }
+        setRole(result.role);
+        setName(result.name);
+        localStorage.setItem(
+          "violet-session",
+          JSON.stringify({ name: result.name, role: result.role, email: result.email }),
+        );
+        setTab("management");
+        setManagementTab("overview");
+        setSignedIn(true);
+        setPassword("");
+        setPin("");
+        setMessage("");
+      } catch {
+        setMessage("Staff login is not available right now.");
+      }
       return;
     }
-    if (pin !== rolePins[role]) {
-      setMessage("That PIN is not right for this role.");
-      return;
-    }
-    const profile = getProfile(selectedVolunteerId, visibleProfiles);
-    if (role === "volunteer" && !profile.id) {
+
+    const profile =
+      visibleProfiles.find((item) => item.id === selectedVolunteerId) ||
+      visibleProfiles.find(
+        (item) =>
+          item.email.toLowerCase() === staffEmail ||
+          item.name.toLowerCase() === enteredIdentity.toLowerCase(),
+      ) ||
+      getProfile(selectedVolunteerId, visibleProfiles);
+    if (!profile.id) {
       setMessage("No volunteer profile is loaded yet. Add or import real volunteer records first.");
       return;
     }
-    const nextName = role === "volunteer" ? profile.name : name;
+    const expectedPin = profile.pin || (profile.id.startsWith("demo-") ? rolePins.volunteer : "");
+    if (!expectedPin || pin !== expectedPin) {
+      setMessage("That PIN is not right for this volunteer.");
+      return;
+    }
+    const nextName = profile.name;
+    setRole("volunteer");
     setName(nextName);
     localStorage.setItem(
       "violet-session",
-      JSON.stringify({ name: nextName, role, selectedVolunteerId }),
+      JSON.stringify({ name: nextName, role: "volunteer", selectedVolunteerId }),
     );
-    setTab(role === "volunteer" ? "home" : "management");
+    setTab("home");
     setManagementTab("overview");
     setSignedIn(true);
     setMessage("");
@@ -2794,6 +2848,7 @@ export default function VioletProjectPortalPage() {
     localStorage.removeItem("violet-session");
     setSignedIn(false);
     setPin("");
+    setPassword("");
     setMessage("");
   }
 
@@ -4377,6 +4432,7 @@ export default function VioletProjectPortalPage() {
       name: profile.name,
       role: profile.role || "Volunteer",
       email: profile.email,
+      pin: profile.pin || "",
       phone: profile.phone,
       emergencyContact: profile.emergencyContact,
       availability: profile.availability,
@@ -4421,6 +4477,7 @@ export default function VioletProjectPortalPage() {
       name: profileDraft.name.trim(),
       role: profileDraft.role.trim() || "Volunteer",
       email: profileDraft.email.trim(),
+      pin: profileDraft.pin.trim(),
       phone: profileDraft.phone.trim(),
       emergencyContact: profileDraft.emergencyContact.trim(),
       availability: profileDraft.availability.trim(),
@@ -4713,51 +4770,32 @@ export default function VioletProjectPortalPage() {
           <Topbar />
           <section className={styles.loginCard}>
             <h1>{clientSettings.organisationName} hub</h1>
-            <p>
-              Log hours, submit expenses, update details and view events.
-            </p>
             <form className={styles.loginGrid} onSubmit={signIn}>
               <label className={styles.field}>
-                Role
-                <select value={role} onChange={(event) => setRole(event.target.value as Role)}>
-                  <option value="volunteer">Volunteer</option>
-                  <option value="admin">Admin</option>
-                  <option value="manager">Management</option>
-                </select>
+                Email address or name
+                <input
+                  value={loginEmail}
+                  onChange={(event) => setLoginEmail(event.target.value)}
+                  placeholder="name@violetproject.co.uk or your name"
+                />
               </label>
-              {role === "volunteer" ? (
-                <label className={styles.field}>
-                  Volunteer
-                  <select
-                    value={selectedVolunteerId}
-                    onChange={(event) => setSelectedVolunteerId(event.target.value)}
-                  >
-                    {!visibleProfiles.length && <option value="">No volunteer profiles loaded yet</option>}
-                    {visibleProfiles.map((profile) => (
-                      <option key={profile.id} value={profile.id}>
-                        {profile.name}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-              ) : (
-                <label className={styles.field}>
-                  Name
-                  <input value={name} onChange={(event) => setName(event.target.value)} placeholder="Your name" />
-                </label>
-              )}
               <label className={styles.field}>
                 PIN
-                <input value={pin} onChange={(event) => setPin(event.target.value)} inputMode="numeric" placeholder="Role PIN" />
+                <input value={pin} onChange={(event) => setPin(event.target.value)} inputMode="numeric" placeholder="Volunteer PIN" />
+              </label>
+              <label className={styles.field}>
+                Password
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
+                  placeholder="Staff password"
+                />
               </label>
               <button className={styles.primary} type="submit">
                 Open hub
               </button>
             </form>
-            <details className={styles.devAccess}>
-              <summary>Temporary access</summary>
-              <p>Volunteer 2468 · Admin 7391 · Manager 9021</p>
-            </details>
             {message && <p className={styles.notice}>{message}</p>}
           </section>
         </div>
@@ -5843,7 +5881,7 @@ export default function VioletProjectPortalPage() {
 
                   <article className={styles.card}>
                     <div className={styles.cardHeader}>
-                      <strong>SharePoint hidden backend map</strong>
+                      <strong>Background data map</strong>
                       <StatusChip label="Portal first" />
                     </div>
                     <div className={styles.tableWrap}>
@@ -5852,7 +5890,7 @@ export default function VioletProjectPortalPage() {
                           <tr>
                             <th>Area</th>
                             <th>Portal data</th>
-                            <th>SharePoint target</th>
+                            <th>Storage area</th>
                             <th>Sync</th>
                             <th>Status</th>
                           </tr>
@@ -6607,6 +6645,7 @@ export default function VioletProjectPortalPage() {
                         <label className={styles.field}>Name<input value={profileDraft.name} onChange={(event) => setProfileDraft({ ...profileDraft, name: event.target.value })} placeholder="Full name" /></label>
                         <label className={styles.field}>Role<input value={profileDraft.role} onChange={(event) => setProfileDraft({ ...profileDraft, role: event.target.value })} placeholder="Volunteer / coordinator / admin" /></label>
                         <label className={styles.field}>Email<input type="email" value={profileDraft.email} onChange={(event) => setProfileDraft({ ...profileDraft, email: event.target.value })} placeholder="name@example.org" /></label>
+                        <label className={styles.field}>Volunteer PIN<input inputMode="numeric" value={profileDraft.pin} onChange={(event) => setProfileDraft({ ...profileDraft, pin: event.target.value })} placeholder="Private PIN" /></label>
                         <label className={styles.field}>Phone<input value={profileDraft.phone} onChange={(event) => setProfileDraft({ ...profileDraft, phone: event.target.value })} placeholder="Phone number" /></label>
                         <label className={styles.field}>Emergency contact<input value={profileDraft.emergencyContact} onChange={(event) => setProfileDraft({ ...profileDraft, emergencyContact: event.target.value })} placeholder="Name and number" /></label>
                         <label className={styles.field}>DBS expiry<input type="date" value={profileDraft.dbsExpiry} onChange={(event) => setProfileDraft({ ...profileDraft, dbsExpiry: event.target.value })} /></label>
@@ -6631,15 +6670,6 @@ export default function VioletProjectPortalPage() {
                         <div><span>Demo records</span><b>{demoMode ? demoProfiles.length : 0}</b></div>
                       </div>
                     </article>
-                    <article className={styles.card}>
-                      <strong>Temporary access codes</strong>
-                      <p className={styles.meta}>Use these only until Microsoft login is connected.</p>
-                      <div className={styles.compactList}>
-                        <div><span>Volunteer</span><b>2468</b></div>
-                        <div><span>Admin</span><b>7391</b></div>
-                        <div><span>Manager</span><b>9021</b></div>
-                      </div>
-                    </article>
                   </div>
                   <div className={styles.tableWrap}>
                     <table className={styles.table}>
@@ -6647,6 +6677,7 @@ export default function VioletProjectPortalPage() {
                         <tr>
                           <th>Name</th>
                           <th>Email</th>
+                          <th>PIN</th>
                           <th>Role</th>
                           <th>Phone</th>
                           <th>Profile health</th>
@@ -6661,6 +6692,7 @@ export default function VioletProjectPortalPage() {
                               {profile.id.startsWith("demo-") && <><br /><StatusChip label="Demo sample" /></>}
                             </td>
                             <td>{profile.email || "Missing"}</td>
+                            <td>{profile.pin ? "Set" : "Missing"}</td>
                             <td>{profile.role}</td>
                             <td>{profile.phone || "Missing"}</td>
                             <td>{profile.email && profile.phone && profile.emergencyContact ? "Complete" : "Missing details"}</td>
@@ -6690,7 +6722,7 @@ export default function VioletProjectPortalPage() {
                         ))}
                         {!visibleProfiles.length && (
                           <tr>
-                            <td colSpan={6}>
+                            <td colSpan={7}>
                               No people added yet. Use the form above to add the first volunteer/person record, or turn on demo mode in Settings for a presentation.
                             </td>
                           </tr>
@@ -7983,7 +8015,7 @@ export default function VioletProjectPortalPage() {
                       <div className={styles.compactList}>
                         <div><span>Admin view</span><b>Status, allocation, waits, attendance</b></div>
                         <div><span>Restricted view</span><b>Session notes and clinical detail</b></div>
-                        <div><span>SharePoint target</span><b>Restricted Service Referrals</b></div>
+                        <div><span>Storage area</span><b>Restricted service referrals</b></div>
                         <div><span>Audit need</span><b>Viewed, edited, exported</b></div>
                       </div>
                     </article>
@@ -8246,37 +8278,6 @@ export default function VioletProjectPortalPage() {
                       </article>
                     ))}
                   </div>
-                  <article className={styles.card}>
-                    <div className={styles.cardHeader}>
-                      <strong>Microsoft 365 target</strong>
-                      <StatusChip label={microsoftStatus?.mode || "Checking"} />
-                    </div>
-                    <p className={styles.meta}>
-                      The shared SharePoint site is the operational backend. Melanie&apos;s personal OneDrive is private by default;
-                      selected files can be copied into the shared publish folder when she chooses to share them.
-                    </p>
-                    <div className={styles.compactList}>
-                      <div><span>Shared site</span><b>{microsoftStatus?.sharePoint.webUrl || "Not loaded"}</b></div>
-                      <div><span>Library</span><b>{microsoftStatus?.sharePoint.libraryName || "Documents"}</b></div>
-                      <div><span>Backend folder</span><b>{microsoftStatus?.sharePoint.backendFolder || "Portal Backend"}</b></div>
-                      <div><span>Expense evidence</span><b>{microsoftStatus?.sharePoint.evidenceFolder || "Portal Backend/Evidence Uploads"}</b></div>
-                      <div><span>Task evidence</span><b>{microsoftStatus?.sharePoint.taskEvidenceFolder || "Portal Backend/Task Evidence"}</b></div>
-                      <div><span>Reports</span><b>{microsoftStatus?.sharePoint.reportsFolder || "Portal Backend/Reports and Exports"}</b></div>
-                      <div><span>OneDrive policy</span><b>{microsoftStatus?.oneDrive.policy === "selective_publish_only" ? "Select files, then publish copies" : microsoftStatus?.oneDrive.policy || "Selective publish only"}</b></div>
-                      <div><span>Publish folder</span><b>{microsoftStatus?.oneDrive.publishFolder || "Portal Backend/Published from OneDrive"}</b></div>
-                      <div><span>Missing runtime auth</span><b>{microsoftStatus?.missing.auth.length ? microsoftStatus.missing.auth.join(", ") : "None"}</b></div>
-                    </div>
-                    <div className={styles.emailActions}>
-                      <button className={styles.secondary} type="button" disabled={microsoftStatusBusy} onClick={refreshMicrosoftStatus}>
-                        {microsoftStatusBusy ? "Checking..." : "Refresh Microsoft status"}
-                      </button>
-                      {microsoftStatus?.sharePoint.webUrl && (
-                        <a className={styles.quietButton} href={microsoftStatus.sharePoint.webUrl} target="_blank" rel="noreferrer">
-                          Open shared site
-                        </a>
-                      )}
-                    </div>
-                  </article>
                   <article className={styles.card}>
                     <div className={styles.cardHeader}>
                       <strong>Hidden sync dashboard</strong>
@@ -8613,8 +8614,7 @@ function Topbar() {
   return (
     <header className={styles.topbar}>
       <div className={styles.logoBrand}>
-        <strong>Violet Project</strong>
-        <span>violetproject.co.uk</span>
+        <Image className={styles.logoMark} src="/violet-project-logo-real.png" alt="Violet Project" width={1700} height={1120} priority />
       </div>
     </header>
   );

@@ -1,28 +1,29 @@
 .page {
-  --violet-main: #8360af;
-  --violet-deep: #4e3b84;
-  --violet-soft: #bc8cc6;
-  --violet-strong: #632494;
-  --violet-blush: #e6c2bf;
-  --violet-mist: #f2f0f3;
+  --violet-main: #7f3bd3;
+  --violet-deep: #25142f;
+  --violet-soft: #c9a8ee;
+  --violet-strong: #6f00b9;
+  --violet-blush: #efe8fb;
+  --violet-mist: #f7f2fb;
   --violet-teal: #3b9094;
   --violet-teal-deep: #12687d;
   --violet-wine: #462537;
   --violet-blue: #2077b4;
-  --violet-white: #fcfafa;
+  --violet-white: #fffdfd;
   --violet-grey: #7a797d;
   --violet-slate: #737177;
   --violet-teal-dark: #34787b;
   --violet-paper: #ffffff;
   --violet-bright: #714ec7;
-  --violet-ink: #20162a;
-  --violet-muted: #594a66;
-  --violet-border: rgba(131, 96, 175, 0.2);
-  --violet-shadow: rgba(70, 37, 55, 0.08);
+  --violet-ink: #201522;
+  --violet-muted: #5b5164;
+  --violet-border: rgba(127, 59, 211, 0.2);
+  --violet-shadow: rgba(32, 21, 34, 0.1);
   min-height: 100vh;
-  background: linear-gradient(180deg, var(--violet-white) 0%, var(--violet-mist) 58%, rgba(59, 144, 148, 0.12) 100%);
+  background:
+    linear-gradient(180deg, rgba(255, 253, 253, 0.96) 0%, rgba(247, 242, 251, 0.96) 60%, rgba(239, 232, 251, 0.98) 100%);
   color: var(--violet-ink);
-  font-family: Montserrat, Arial, sans-serif;
+  font-family: "Trebuchet MS", Montserrat, Arial, sans-serif;
 }
 
 .shell {
@@ -36,7 +37,7 @@
   justify-content: center;
   gap: 16px;
   align-items: center;
-  margin-bottom: 18px;
+  margin-bottom: 22px;
 }
 
 .brand,
@@ -48,9 +49,21 @@
 }
 
 .logoBrand {
-  display: grid;
-  gap: 4px;
+  display: flex;
+  gap: 14px;
   justify-items: center;
+  width: min(520px, 100%);
+  padding: 12px 18px;
+  border: 1px solid rgba(127, 59, 211, 0.12);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 12px 30px rgba(32, 21, 34, 0.08);
+}
+
+.logoMark {
+  display: block;
+  width: 100%;
+  height: auto;
 }
 
 .brand strong {
@@ -60,11 +73,11 @@
 
 .logoBrand strong {
   display: block;
-  color: var(--violet-strong);
+  color: var(--violet-ink);
   font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(30px, 8vw, 56px);
-  font-style: italic;
-  line-height: 0.95;
+  font-size: clamp(20px, 4vw, 28px);
+  font-style: normal;
+  line-height: 1.05;
 }
 
 .brand span {
@@ -76,11 +89,11 @@
 
 .logoBrand span {
   display: block;
-  color: var(--violet-teal-deep);
-  font-size: 14px;
+  margin-top: 4px;
+  color: var(--violet-strong);
+  font-size: 12px;
   font-weight: 900;
-  letter-spacing: 0.12em;
-  text-transform: lowercase;
+  letter-spacing: 0;
   white-space: nowrap;
 }
 
@@ -99,7 +112,7 @@
   border: 1px solid rgba(59, 144, 148, 0.2);
   border-radius: 8px;
   padding: clamp(18px, 3vw, 28px);
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(230, 194, 191, 0.22) 46%, rgba(59, 144, 148, 0.12));
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(239, 232, 251, 0.8) 52%, rgba(59, 144, 148, 0.12));
   box-shadow: 0 18px 44px var(--violet-shadow);
 }
 
@@ -382,18 +395,18 @@
 
 .primary {
   color: var(--violet-paper);
-  background: var(--violet-strong);
+  background: #201522;
 }
 
 .secondary {
   color: var(--violet-paper);
-  background: var(--violet-teal);
+  background: var(--violet-strong);
 }
 
 .quietButton,
 .button {
   color: var(--violet-deep);
-  background: rgba(188, 140, 198, 0.22);
+  background: rgba(201, 168, 238, 0.28);
 }
 
 .snapshot {
@@ -2655,6 +2668,12 @@
 }
 
 @media (max-width: 760px) {
+  .logoBrand {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+  }
+
   .topbar,
   .heroActions,
   .buttonRow {

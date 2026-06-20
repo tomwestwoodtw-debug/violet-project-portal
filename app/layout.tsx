@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   title: "Violet Project Portal",
   description: "Staff, volunteer and admin portal for Violet Project.",
   icons: {
-    icon: "/violet-project-logo.svg",
+    icon: "/violet-project-logo-real.png",
   },
 };
 
