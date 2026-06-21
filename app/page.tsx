@@ -4782,25 +4782,31 @@ export default function VioletProjectPortalPage() {
                   placeholder="Email or name"
                 />
               </label>
-              <label className={styles.field}>
-                PIN
-                <input value={pin} onChange={(event) => setPin(event.target.value)} inputMode="numeric" placeholder="Volunteer PIN" />
-              </label>
-              <label className={styles.field}>
-                Password
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(event) => setPassword(event.target.value)}
-                  placeholder="Staff password"
-                />
-              </label>
+              <div className={styles.loginAccessGroup}>
+                <span>Volunteers</span>
+                <label className={styles.field}>
+                  PIN
+                  <input value={pin} onChange={(event) => setPin(event.target.value)} inputMode="numeric" placeholder="Enter your PIN" />
+                </label>
+              </div>
+              <div className={styles.loginAccessGroup}>
+                <span>Password access</span>
+                <label className={styles.field}>
+                  Password
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={(event) => setPassword(event.target.value)}
+                    placeholder="Enter your password"
+                  />
+                </label>
+              </div>
               <button className={styles.primary} type="submit">
                 Open hub
               </button>
             </form>
             {message && <p className={styles.notice}>{message}</p>}
-            <p className={styles.loginPrivacy}>Use your volunteer PIN, or your staff password if you have one.</p>
+            <p className={styles.loginPrivacy}>Use either your volunteer PIN or your password.</p>
           </section>
         </div>
       </main>

@@ -503,6 +503,23 @@
   font-size: 15px;
 }
 
+.loginAccessGroup {
+  display: grid;
+  gap: 10px;
+  border: 1px solid rgba(131, 96, 175, 0.14);
+  border-radius: 8px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.68);
+}
+
+.loginAccessGroup > span {
+  display: block;
+  color: var(--violet-strong);
+  font-size: 12px;
+  font-weight: 950;
+  line-height: 1;
+}
+
 .loginPrivacy {
   margin: -4px 0 0;
   border-top: 1px solid rgba(131, 96, 175, 0.14);
