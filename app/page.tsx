@@ -4766,10 +4766,13 @@ export default function VioletProjectPortalPage() {
   if (!signedIn) {
     return (
       <main className={styles.page}>
-        <div className={styles.shell}>
+        <div className={`${styles.shell} ${styles.loginShell}`}>
           <Topbar />
           <section className={styles.loginCard}>
-            <h1>{clientSettings.organisationName} hub</h1>
+            <div className={styles.loginIntro}>
+              <h1>{clientSettings.organisationName} hub</h1>
+              <p>Private access for the people supporting Violet Project.</p>
+            </div>
             <form className={styles.loginGrid} onSubmit={signIn}>
               <label className={styles.field}>
                 Email address or name
@@ -4797,6 +4800,7 @@ export default function VioletProjectPortalPage() {
               </button>
             </form>
             {message && <p className={styles.notice}>{message}</p>}
+            <p className={styles.loginPrivacy}>Use your volunteer PIN, or your staff password if you have one.</p>
           </section>
         </div>
       </main>
