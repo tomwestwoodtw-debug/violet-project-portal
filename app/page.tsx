@@ -4776,7 +4776,7 @@ export default function VioletProjectPortalPage() {
                 <input
                   value={loginEmail}
                   onChange={(event) => setLoginEmail(event.target.value)}
-                  placeholder="name@violetproject.co.uk or your name"
+                  placeholder="Email or name"
                 />
               </label>
               <label className={styles.field}>
